@@ -22,7 +22,7 @@
 
 /* Common Block Declarations */
 
-long verbosity;
+/*long verbosity;*/
 
 /* /////////////////////////////////////////////////////////////// */
 

@@ -1,4 +1,13 @@
-MEX ?= /usr/local/MATLAB/R2014b/bin/mex #-v -largeArrayDims
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Darwin)
+    MATLABROOT ?= /Applications/MATLAB_R2015a.app
+endif
+ifeq ($(UNAME), Linux)
+    MATLABROOT ?= /usr/local/MATLAB/R2014b/
+endif
+
+MEX = $(MATLABROOT)/bin/mex
 
 #
 # makefile for svm_light 

@@ -1,4 +1,15 @@
-MEX ?= /usr/local/MATLAB/R2014b/bin/mex -O CFLAGS='-std=c99 -fPIC' 
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Darwin)
+    MATLABROOT ?= /Applications/MATLAB_R2015a.app
+endif
+ifeq ($(UNAME), Linux)
+    MATLABROOT ?= /usr/local/MATLAB/R2014b/
+endif
+
+MEX = $(MATLABROOT)/bin/mex -O CFLAGS='-std=c99 -fPIC' 
+
+#MEX ?= /usr/local/MATLAB/R2014b/bin/mex -O CFLAGS='-std=c99 -fPIC' 
 
 # Makefile for SVM-struct, 03.10.06
 

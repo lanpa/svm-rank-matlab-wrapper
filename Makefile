@@ -1,5 +1,14 @@
 # Makefile for SVM-perf, 31.10.05
-MEX ?= /usr/local/MATLAB/R2014b/bin/mex
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Darwin)
+    MATLABROOT ?= /Applications/MATLAB_R2015a.app
+endif
+ifeq ($(UNAME), Linux)
+    MATLABROOT ?= /usr/local/MATLAB/R2014b/
+endif
+
+MEX = $(MATLABROOT)/bin/mex
 #Use the following to compile under unix or cygwin
 CC = gcc
 LD = gcc
