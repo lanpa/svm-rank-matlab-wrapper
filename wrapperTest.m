@@ -1,9 +1,3 @@
-%TODO: parameter, classify
-%input data check
-%usage:
-%svm_rank_learn(label, qid, feature, 1, filename_model);
-%[TotalNumSwappedpairs, AvgSwappedpairsPercent] = svm_rank_classify(label,
-%   qid, feature, filename_model);
 clear;
 label = [3 2 1 1 1 2 1 1 2 3 4 1];
 qid = [1 1 1 1 2 2 2 2 3 3 3 3];
@@ -28,9 +22,10 @@ if 1
 end
 disp('start mex');
 
-parfor i = 1:4
-    svm_rank_learn(label, qid, (feature), 1, ['test_model' num2str(i) '.dat']);
-    svm_rank_classify(label, qid, feature, ['test_model' num2str(i) '.dat']);
+parfor i = 1:2
+    svm_rank_learn(label, qid, (feature), ' -c 1 -v 0' ,['test_model' num2str(i) '.dat']);
+    err = svm_rank_classify(label, qid, feature, ['test_model' num2str(i) '.dat']);
+    disp(err);
     clear mex;
 end
 
@@ -46,7 +41,9 @@ for i = 1:numel(label)
 end
 fclose(f);
 
-parfor i = 1:4
+% compare the output with original code
+
+parfor i = 1:2
     unix(['/home/dexter/Downloads/svm_rank/svm_rank_learn -v 0 -c ' num2str(1) ' train001.txt model_orig' num2str(i) '.dat']);
 end
 
