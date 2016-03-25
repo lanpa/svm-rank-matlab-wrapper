@@ -45,56 +45,62 @@ void   read_input_parameters(int, char **, char *, char *,long *, long *,
 void   wait_any_key();
 void   print_help();
 
-void my_assert(x){if(!x)printf("====assertion failed!!!!!!====\n");}
 void mexFunction (int nlhs, mxArray * plhs[], int nrhs, const mxArray  * prhs[])
 {
-    my_assert(nrhs>=3);
+    if(nrhs!=5){
+        printf("incorrect parameters");
+    }
+    if(!mxIsDouble(prhs[0]) || !mxIsDouble(prhs[1]) || !mxIsSingle(prhs[2])){
+        printf("wrong data format.");
+        return;
+    }
     double* label = mxGetPr(prhs[0]);
     double* qid = mxGetPr(prhs[1]);
     float* feature = mxGetPr(prhs[2]); //nFeature x nSample
-    double* cost = mxGetPr(prhs[3]);
+    char* param  = mxArrayToString(prhs[3]);
     char* input_buf = mxArrayToString(prhs[4]);
-    mwSize *dims_label, *dims_qid, *dims_feature;
+    const mwSize *dims_label, *dims_qid, *dims_feature;
     dims_label = mxGetDimensions(prhs[0]);
     dims_qid = mxGetDimensions(prhs[1]);
     dims_feature = mxGetDimensions(prhs[2]);
     //row vector
-    my_assert(dims_label[1]==dims_qid[1] && dims_label[1]==dims_feature[1]);
-    my_assert(dims_label[0]==1 && dims_label[0]==1);
+    if(!(dims_label[1]==dims_qid[1] && dims_label[1]==dims_feature[1])){
+        printf("data dimension not match.");
+    }
+    if(!(dims_label[0]==1 && dims_label[0]==1)){
+        printf("label, qid shoud be 1d vector");
+    }
     int nSample = dims_feature[1];//num_DOCS
     int nFeature = dims_feature[0];
-    /*
-       for (int i = 0;i<nSample;i++){
-       printf("data: %d ",i);
-       for (int j = 0;j<nFeature;j++)
-       printf("%d: %5.1f ",j, feature[i*nFeature+j]);
-       printf("\n");
-       }
-     */
-
     printf("svm rank matlab API\n");
-    //printf("%f\n", cost[0]);
     SAMPLE sample;  /* training sample */
     LEARN_PARM learn_parm;
     KERNEL_PARM kernel_parm;
     STRUCT_LEARN_PARM struct_parm;
     STRUCTMODEL structmodel;
     int alg_type;
-    int argc = 7;
-    char* argv[7];
-    char cost_str[20];
-    sprintf(cost_str, "%f", cost[0]);
-    //printf("%f\n", cost_str);
+
+//create fake argc, argv
+    const int maxarg = 100;
+    char* argv[maxarg];
     argv[0] ="dummy.mex";
-    argv[1] ="-v";
-    argv[2] ="0";
-    argv[3] ="-c";
-    argv[4] =cost_str;
-    argv[5] ="train.txt";
-    argv[6] =input_buf;//"model.dat";
-    //argv[5] ="-v";
-    //argv[6] ="0";
-    //svm_struct_learn_api_init(argc,argv); do nothing for svm_rank
+    int argc = 1;
+    char input[200];
+    strcpy(input, param);
+    char* pch;
+    pch = strtok(input, " ");
+    while(pch!=NULL && argc<maxarg){
+        argv[argc] = malloc(sizeof(char)*20);
+        strcpy(argv[argc], pch);
+        argc++;
+        pch = strtok(NULL, " ");
+    }
+    argv[argc] = "dummytraininput";argc++;
+    argv[argc] = input_buf;argc++;
+    for(int i=0;i<argc;i++)
+        printf("%d: %s\n", i, argv[i]);
+ 
+    svm_struct_learn_api_init(argc,argv);
     read_input_parameters(argc,argv,trainfile,modelfile,&verbosity,
             &struct_verbosity,&struct_parm,&learn_parm,
             &kernel_parm,&alg_type);
