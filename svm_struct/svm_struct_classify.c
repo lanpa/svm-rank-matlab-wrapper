@@ -38,19 +38,29 @@ void print_help(void);
 void mexFunction (int nlhs, mxArray * plhs[], int nrhs, const mxArray  * prhs[])
 
 {
-    printf("dexter's classify interface\n");
+    if(nrhs!=4){
+        printf("incorrect parameters");
+    }
+    if(!mxIsDouble(prhs[0]) || !mxIsDouble(prhs[1]) || !mxIsSingle(prhs[2])){
+        printf("wrong data format.");
+        return;
+    }
     double* label = mxGetPr(prhs[0]);
     double* qid = mxGetPr(prhs[1]);
     float* feature = mxGetPr(prhs[2]); //nFeature x nSample
     char* input_buf = mxArrayToString(prhs[3]);
-    //double* cost = mxGetPr(prhs[3]);
-    mwSize *dims_label, *dims_qid, *dims_feature;
+
+    const mwSize *dims_label, *dims_qid, *dims_feature;
     dims_label = mxGetDimensions(prhs[0]);
     dims_qid = mxGetDimensions(prhs[1]);
     dims_feature = mxGetDimensions(prhs[2]);
     //row vector
-    //my_assert(dims_label[1]==dims_qid[1] && dims_label[1]==dims_feature[1]);
-    //my_assert(dims_label[0]==1 && dims_label[0]==1);
+    if(!(dims_label[1]==dims_qid[1] && dims_label[1]==dims_feature[1])){
+        printf("data dimension not match.");
+    }
+    if(!(dims_label[0]==1 && dims_label[0]==1)){
+        printf("label, qid shoud be 1d vector");
+    }
     int nSample = dims_feature[1];//num_DOCS
     int nFeature = dims_feature[0];
     
@@ -66,10 +76,10 @@ void mexFunction (int nlhs, mxArray * plhs[], int nrhs, const mxArray  * prhs[])
     LABEL y;
     int argc = 5;
     char* argv[5];
-    argv[0] ="123.mex";
+    argv[0] ="dummy.mex";
     argv[1] ="-v";
     argv[2] ="1";
-    argv[3] ="train.txt";
+    argv[3] ="dummytraininput";
     argv[4] =input_buf;//"model.dat";
 
   
