@@ -22,7 +22,7 @@ if 1
 end
 disp('start mex');
 
-parfor i = 1:2
+for i = 1:2
     svm_rank_learn(label, qid, (feature), ' -c 1 -v 0' ,['test_model' num2str(i) '.dat']);
     err = svm_rank_classify(label, qid, feature, ['test_model' num2str(i) '.dat']);
     disp(err);
@@ -42,13 +42,17 @@ end
 fclose(f);
 
 % compare the output with original code
+if computer=='GLNXA64'
+    unix('wget http://download.joachims.org/svm_rank/current/svm_rank_linux64.tar.gz');
+    unix('tar -xzf svm_rank_linux64.tar.gz');
+    for i = 1:2
+        unix(['./svm_rank_learn -v 0 -c ' num2str(1) ' train001.txt model_orig' num2str(i) '.dat']);
+    end
 
-parfor i = 1:2
-    unix(['/home/dexter/Downloads/svm_rank/svm_rank_learn -v 0 -c ' num2str(1) ' train001.txt model_orig' num2str(i) '.dat']);
+    [s, r] = unix('./svm_rank_classify train001.txt model_orig1.dat');
+    disp(r);
+    disp(sprintf('matlab wrapper result is: %f',  err));
+    [s,r]=unix('sha1sum *.dat');
+    disp(r);
 end
-
-[s, r] = unix('/home/dexter/Downloads/svm_rank/svm_rank_classify train001.txt model_orig1.dat');
-disp(r);
-[s,r]=unix('sha1sum *.dat');
-disp(r);
 
